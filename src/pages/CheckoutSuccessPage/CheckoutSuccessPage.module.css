@@ -1,0 +1,135 @@
+.page {
+  min-height: calc(100vh - 72px);
+  padding: 40px 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f8fafc;
+}
+
+.card {
+  width: 100%;
+  max-width: 560px;
+  padding: 48px 40px;
+
+  text-align: center;
+
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+}
+
+.icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  background: #dcfce7;
+  color: #166534;
+
+  font-size: 34px;
+  font-weight: 800;
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 12px;
+
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #64748b;
+
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.card h1 {
+  margin: 16px 0 10px;
+
+  color: #0f172a;
+  font-size: 34px;
+}
+
+.description {
+  margin: 0 auto;
+
+  max-width: 430px;
+
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.order {
+  margin-top: 30px;
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  border-radius: 14px;
+  background: #f8fafc;
+  text-align: left;
+}
+
+.order div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.order span {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.order strong {
+  color: #0f172a;
+}
+
+.button {
+  display: block;
+
+  margin-top: 24px;
+  padding: 14px 20px;
+
+  border-radius: 12px;
+
+  background: #0f172a;
+  color: white;
+
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.button:hover {
+  background: #1e293b;
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 24px 16px;
+  }
+
+  .card {
+    padding: 36px 22px;
+  }
+
+  .card h1 {
+    font-size: 28px;
+  }
+
+  .order div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+}

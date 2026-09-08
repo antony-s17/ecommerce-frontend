@@ -1,0 +1,116 @@
+.page {
+  min-height: calc(100vh - 72px);
+
+  padding: 4rem 0;
+
+  background: #f8fafc;
+}
+
+.container {
+  width: min(1100px, 92%);
+
+  margin: 0 auto;
+}
+
+.badge {
+  display: inline-block;
+
+  margin-bottom: 1rem;
+
+  padding: 0.45rem 0.75rem;
+
+  border-radius: 999px;
+
+  background: #e2e8f0;
+  color: #334155;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.container h1 {
+  margin: 0 0 0.8rem;
+
+  color: #111827;
+
+  font-size: clamp(2rem, 4vw, 3rem);
+
+  letter-spacing: -0.04em;
+}
+
+.container > p {
+  max-width: 600px;
+
+  margin: 0;
+
+  color: #64748b;
+
+  line-height: 1.7;
+}
+
+.cards {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 1.2rem;
+
+  margin-top: 2.5rem;
+}
+
+.card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+
+  padding: 1.5rem;
+
+  background: white;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+
+  box-shadow:
+    0 8px 25px rgba(15, 23, 42, 0.04);
+}
+
+.icon {
+  width: 45px;
+  height: 45px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 12px;
+
+  background: #f1f5f9;
+
+  font-size: 1.3rem;
+}
+
+.card h2 {
+  margin: 0 0 0.4rem;
+
+  color: #111827;
+
+  font-size: 1rem;
+}
+
+.card p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 0.85rem;
+
+  line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}
