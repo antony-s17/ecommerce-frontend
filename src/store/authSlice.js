@@ -101,16 +101,16 @@ const authSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      .addCase(fetchProfile.pending, (state) => {
+      .addCase(getUserProfile.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchProfile.fulfilled, (state, action) => {
+      .addCase(getUserProfile.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
         state.isAuthenticated = true;
       })
-      .addCase(fetchProfile.rejected, (state, action) => {
+      .addCase(getUserProfile.rejected, (state, action) => {
         state.loading = false;
         state.user = null;
         state.isAuthenticated = false;
