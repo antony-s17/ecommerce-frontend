@@ -151,11 +151,9 @@ const cartSlice = createSlice({
       })
 
       .addCase(
-        processCheckout.fulfilled,
-        (state, action) => {
+       processCheckout.fulfilled,
+      (state, action) => {
           state.loading = false;
-          state.cartId = null;
-          state.items = [];
           state.error = null;
           state.order = action.payload;
         }
