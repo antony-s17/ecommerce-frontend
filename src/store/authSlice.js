@@ -55,9 +55,16 @@ export const loginUser = createAsyncThunk(
       return profileResponse.data;
 
     } catch (error) {
+      const status = error.response?.status;
+
+      if (status === 400 || status === 401) {
+        return rejectWithValue(
+          "Credenciales inválidas"
+        );
+      }
+
       return rejectWithValue(
-        error.response?.data?.message ||
-        "Credenciales incorrectas"
+        "No se pudo iniciar sesión"
       );
     }
   }
