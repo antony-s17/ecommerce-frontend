@@ -1,0 +1,369 @@
+.section {
+  margin-top: 56px;
+
+  padding: 28px;
+
+  border:
+    1px solid rgba(103, 232, 249, 0.08);
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #111c2e,
+      #0c1525
+    );
+
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.2);
+}
+
+/* HEADER */
+
+.header {
+  margin-bottom: 24px;
+}
+
+.badge {
+  display: inline-flex;
+
+  padding: 6px 12px;
+
+  border:
+    1px solid rgba(103, 232, 249, 0.14);
+
+  border-radius: 999px;
+
+  background:
+    rgba(6, 182, 212, 0.08);
+
+  color: #67e8f9;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.header h2 {
+  margin: 12px 0 6px;
+
+  color: #f8fafc;
+
+  font-size: 22px;
+
+  letter-spacing: -0.02em;
+}
+
+.header p {
+  margin: 0;
+
+  color: #94a3b8;
+
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* FORM */
+
+.form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 9px;
+}
+
+.field label {
+  color: #cbd5e1;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* RATING */
+
+.rating {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  min-height: 42px;
+}
+
+.starButton {
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #475569;
+
+  font-family: inherit;
+  font-size: 34px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    color 0.15s ease,
+    transform 0.15s ease,
+    filter 0.15s ease;
+}
+
+.starButton:hover {
+  transform: scale(1.15);
+}
+
+.starButton:focus-visible {
+  outline: 2px solid #67e8f9;
+  outline-offset: 4px;
+
+  border-radius: 4px;
+}
+
+.starActive {
+  color: #facc15;
+
+  filter:
+    drop-shadow(
+      0 0 5px rgba(250, 204, 21, 0.25)
+    );
+}
+
+.ratingValue {
+  margin-left: 10px;
+
+  color: #94a3b8;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* TEXTAREA */
+
+.field textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 13px 14px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.1);
+
+  border-radius: 10px;
+
+  background:
+    rgba(255, 255, 255, 0.04);
+
+  color: #f8fafc;
+
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+
+  resize: vertical;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.field textarea::placeholder {
+  color: #64748b;
+}
+
+.field textarea:focus {
+  border-color:
+    rgba(103, 232, 249, 0.35);
+
+  background:
+    rgba(255, 255, 255, 0.06);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(6, 182, 212, 0.08);
+}
+
+.characterCount {
+  align-self: flex-end;
+
+  color: #64748b;
+
+  font-size: 11px;
+}
+
+/* BOTÓN */
+
+.button {
+  align-self: flex-start;
+
+  padding: 12px 20px;
+
+  border: none;
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #06b6d4
+    );
+
+  color: white;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 10px 24px
+    rgba(6, 182, 212, 0.18);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 14px 30px
+    rgba(6, 182, 212, 0.28);
+}
+
+.button:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+}
+
+/* RESEÑA EXISTENTE */
+
+.review {
+  padding: 20px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.06);
+
+  border-radius: 12px;
+
+  background:
+    rgba(255, 255, 255, 0.03);
+}
+
+.reviewStars {
+  display: flex;
+  align-items: center;
+
+  gap: 3px;
+}
+
+.reviewStar,
+.reviewStarActive {
+  font-size: 23px;
+}
+
+.reviewStar {
+  color: #475569;
+}
+
+.reviewStarActive {
+  color: #facc15;
+
+  filter:
+    drop-shadow(
+      0 0 4px rgba(250, 204, 21, 0.2)
+    );
+}
+
+.review p {
+  margin: 14px 0 0;
+
+  color: #cbd5e1;
+
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* MENSAJES */
+
+.error {
+  padding: 12px 14px;
+
+  border:
+    1px solid rgba(248, 113, 113, 0.16);
+
+  border-radius: 9px;
+
+  background:
+    rgba(127, 29, 29, 0.18);
+
+  color: #fecaca;
+
+  font-size: 13px;
+}
+
+.success {
+  margin-top: 14px;
+
+  padding: 12px 14px;
+
+  border:
+    1px solid rgba(34, 197, 94, 0.16);
+
+  border-radius: 9px;
+
+  background:
+    rgba(22, 101, 52, 0.18);
+
+  color: #bbf7d0;
+
+  font-size: 13px;
+}
+
+.message {
+  margin: 0;
+
+  color: #94a3b8;
+
+  font-size: 14px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 600px) {
+  .section {
+    margin-top: 36px;
+
+    padding: 22px 18px;
+  }
+
+  .starButton {
+    font-size: 30px;
+  }
+
+  .ratingValue {
+    margin-left: 6px;
+  }
+
+  .button {
+    width: 100%;
+  }
+}
