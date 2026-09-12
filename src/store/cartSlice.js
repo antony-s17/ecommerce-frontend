@@ -25,6 +25,7 @@ export const fetchCart = createAsyncThunk(
     }
   }
 );
+
 export const addProductToCart = createAsyncThunk(
   "cart/addProductToCart",
   async (productId, { rejectWithValue, dispatch }) => {
@@ -34,7 +35,9 @@ export const addProductToCart = createAsyncThunk(
       if (!response.ok) {
         return rejectWithValue(response.message);
       }
+
       dispatch(fetchCart());
+
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -44,6 +47,7 @@ export const addProductToCart = createAsyncThunk(
     }
   }
 );
+
 export const processCheckout = createAsyncThunk(
   "cart/processCheckout",
   async (_, { rejectWithValue }) => {
@@ -81,6 +85,9 @@ const cartSlice = createSlice({
     clearCart: (state) => {
       state.cartId = null;
       state.items = [];
+      state.loading = false;
+      state.error = null;
+      state.order = null;
     },
 
     clearCartError: (state) => {
@@ -101,15 +108,26 @@ const cartSlice = createSlice({
 
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.loading = false;
-        state.cartId = action.payload.cartId;
-        state.items = action.payload.items;
+        state.error = null;
+
+        if (Array.isArray(action.payload)) {
+          state.cartId = null;
+          state.items = [];
+          return;
+        }
+
+        state.cartId =
+          action.payload?.cartId ?? null;
+
+        state.items =
+          action.payload?.items ?? [];
       })
 
       .addCase(fetchCart.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
-    builder
+      })
+
       .addCase(addProductToCart.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -119,27 +137,37 @@ const cartSlice = createSlice({
         state.loading = false;
       })
 
-      .addCase(addProductToCart.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
-    builder
+      .addCase(
+        addProductToCart.rejected,
+        (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        }
+      )
+
       .addCase(processCheckout.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
 
-      .addCase(processCheckout.fulfilled, (state, action) => {
-        state.loading = false;
-        state.cartId = null;
-        state.items = [];
-        state.order = action.payload;
-      })
+      .addCase(
+        processCheckout.fulfilled,
+        (state, action) => {
+          state.loading = false;
+          state.cartId = null;
+          state.items = [];
+          state.error = null;
+          state.order = action.payload;
+        }
+      )
 
-      .addCase(processCheckout.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
+      .addCase(
+        processCheckout.rejected,
+        (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        }
+      );
   },
 });
 

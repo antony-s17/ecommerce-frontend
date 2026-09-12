@@ -1,6 +1,10 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-import { getWishlist, addToWishlist, removeFromWishlist } from "../api/wishlist";
+import {
+  getWishlist,
+  addToWishlist,
+  removeFromWishlist,
+} from "../api/wishlist";
 
 export const fetchWishlist = createAsyncThunk(
   "wishlist/fetchWishlist",
@@ -16,7 +20,7 @@ export const fetchWishlist = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message ||
-          "No se pudo obtener la wishlist"
+          "No se pudo obtener la lista de favoritos"
       );
     }
   }
@@ -34,7 +38,7 @@ export const addProductToWishlist = createAsyncThunk(
 
       dispatch(fetchWishlist());
 
-      return response.data;
+      return response;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message ||
@@ -54,10 +58,9 @@ export const removeProductFromWishlist = createAsyncThunk(
         return rejectWithValue(response.message);
       }
 
-      // Actualizamos la wishlist después de eliminar
       dispatch(fetchWishlist());
 
-      return response.data;
+      return productId;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message ||
@@ -75,15 +78,18 @@ const initialState = {
 
 const wishlistSlice = createSlice({
   name: "wishlist",
+
   initialState,
 
   reducers: {
-    clearWishlistError: (state) => {
+    clearWishlist: (state) => {
+      state.items = [];
+      state.loading = false;
       state.error = null;
     },
 
-    clearWishlist: (state) => {
-      state.items = [];
+    clearWishlistError: (state) => {
+      state.error = null;
     },
   },
 
@@ -96,13 +102,18 @@ const wishlistSlice = createSlice({
 
       .addCase(fetchWishlist.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
+        state.error = null;
+
+        state.items = Array.isArray(action.payload)
+          ? action.payload
+          : [];
       })
 
       .addCase(fetchWishlist.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
+
       .addCase(addProductToWishlist.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -112,10 +123,14 @@ const wishlistSlice = createSlice({
         state.loading = false;
       })
 
-      .addCase(addProductToWishlist.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
+      .addCase(
+        addProductToWishlist.rejected,
+        (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        }
+      )
+
       .addCase(removeProductFromWishlist.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -125,16 +140,19 @@ const wishlistSlice = createSlice({
         state.loading = false;
       })
 
-      .addCase(removeProductFromWishlist.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
+      .addCase(
+        removeProductFromWishlist.rejected,
+        (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        }
+      );
   },
 });
 
 export const {
-  clearWishlistError,
   clearWishlist,
+  clearWishlistError,
 } = wishlistSlice.actions;
 
 export default wishlistSlice.reducer;

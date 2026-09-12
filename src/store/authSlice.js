@@ -1,82 +1,109 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
-  login as loginApi,
-  register as registerApi,
-  logout as logoutApi,
+  createAsyncThunk,
+  createSlice,
+} from "@reduxjs/toolkit";
+
+import {
+  login,
+  register,
+  logout,
   getProfile,
 } from "../api/auth";
 
-export const getUserProfile = createAsyncThunk(
-  "auth/getProfile",
+export const fetchProfile = createAsyncThunk(
+  "auth/fetchProfile",
   async (_, { rejectWithValue }) => {
     try {
       const response = await getProfile();
 
       if (!response.ok) {
-        return rejectWithValue(response.message);
+        return rejectWithValue(
+          response.message ||
+            "No se pudo obtener el perfil"
+        );
       }
 
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "No se pudo obtener el perfil"
+        error.response?.data?.message ||
+          "No hay una sesión activa"
       );
     }
   }
 );
 
-export const login = createAsyncThunk(
+export const loginUser = createAsyncThunk(
   "auth/login",
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await loginApi(credentials);
-
+      const response = await login(credentials);
       if (!response.ok) {
-        return rejectWithValue(response.message);
+        return rejectWithValue(
+          response.message ||
+          "No se pudo iniciar sesión"
+        );
       }
+      const profileResponse = await getProfile();
 
-      return response.data;
+      if (!profileResponse.ok) {
+        return rejectWithValue(
+          profileResponse.message ||
+          "No se pudo obtener el perfil"
+        );
+      }
+      return profileResponse.data;
+
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Error al iniciar sesión"
+        error.response?.data?.message ||
+        "Credenciales incorrectas"
       );
     }
   }
 );
 
-export const register = createAsyncThunk(
+export const registerUser = createAsyncThunk(
   "auth/register",
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await registerApi(userData);
+      const response = await register(userData);
 
       if (!response.ok) {
-        return rejectWithValue(response.message);
+        return rejectWithValue(
+          response.message ||
+            "No se pudo registrar el usuario"
+        );
       }
 
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Error al registrarse"
+        error.response?.data?.message ||
+          "No se pudo registrar el usuario"
       );
     }
   }
 );
 
-export const logout = createAsyncThunk(
+export const logoutUser = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await logoutApi();
+      const response = await logout();
 
       if (!response.ok) {
-        return rejectWithValue(response.message);
+        return rejectWithValue(
+          response.message ||
+            "No se pudo cerrar sesión"
+        );
       }
 
       return true;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Error al cerrar sesión"
+        error.response?.data?.message ||
+          "No se pudo cerrar sesión"
       );
     }
   }
@@ -84,87 +111,124 @@ export const logout = createAsyncThunk(
 
 const initialState = {
   user: null,
-  loading: false,
-  error: null,
   isAuthenticated: false,
+  loading: true,
+  error: null,
 };
 
 const authSlice = createSlice({
   name: "auth",
+
   initialState,
 
   reducers: {
-    clearError: (state) => {
+    clearAuthError: (state) => {
+      state.error = null;
+    },
+
+    clearAuth: (state) => {
+      state.user = null;
+      state.isAuthenticated = false;
+      state.loading = false;
       state.error = null;
     },
   },
 
   extraReducers: (builder) => {
     builder
-      .addCase(getUserProfile.pending, (state) => {
+
+      // FETCH PROFILE
+      .addCase(fetchProfile.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getUserProfile.fulfilled, (state, action) => {
+
+      .addCase(fetchProfile.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
         state.isAuthenticated = true;
+        state.error = null;
       })
-      .addCase(getUserProfile.rejected, (state, action) => {
+
+      .addCase(fetchProfile.rejected, (state) => {
         state.loading = false;
         state.user = null;
         state.isAuthenticated = false;
-        state.error = action.payload;
-      });
-    builder
-      .addCase(login.pending, (state) => {
+
+        // No mostramos error porque puede ser simplemente
+        // que el usuario todavía no haya iniciado sesión.
+        state.error = null;
+      })
+
+      // LOGIN
+      .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(login.fulfilled, (state, action) => {
+
+      .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
         state.isAuthenticated = true;
+        state.error = null;
       })
-      .addCase(login.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-        state.isAuthenticated = false;
-      });
 
-    builder
-      .addCase(register.pending, (state) => {
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+        state.error =
+          action.payload ||
+          "No se pudo iniciar sesión";
+      })
+
+      // REGISTER
+      .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(register.fulfilled, (state, action) => {
+
+      .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
         state.isAuthenticated = true;
+        state.error = null;
       })
-      .addCase(register.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-        state.isAuthenticated = false;
-      });
 
-    builder
-      .addCase(logout.pending, (state) => {
-        state.loading = true;
+      .addCase(registerUser.rejected, (state, action) => {
+        state.loading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+        state.error =
+          action.payload ||
+          "No se pudo registrar el usuario";
       })
-      .addCase(logout.fulfilled, (state) => {
+
+      // LOGOUT
+      .addCase(logoutUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(logoutUser.fulfilled, (state) => {
         state.loading = false;
         state.user = null;
         state.isAuthenticated = false;
         state.error = null;
       })
-      .addCase(logout.rejected, (state, action) => {
+
+      .addCase(logoutUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error =
+          action.payload ||
+          "No se pudo cerrar sesión";
       });
   },
 });
 
-export const { clearError } = authSlice.actions;
+export const {
+  clearAuthError,
+  clearAuth,
+} = authSlice.actions;
 
 export default authSlice.reducer;
