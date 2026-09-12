@@ -34,7 +34,7 @@ function RegisterPage() {
     const result = await dispatch(registerUser(form));
 
     if (registerUser.fulfilled.match(result)) {
-      navigate("/");
+      navigate("/login");
     }
   };
 
