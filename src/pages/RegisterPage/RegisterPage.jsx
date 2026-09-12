@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
-import { register } from "../../store/authSlice";
+import { registerUser } from "../../store/authSlice";
 
 import styles from "./RegisterPage.module.css";
 
@@ -30,9 +30,9 @@ function RegisterPage() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const result = await dispatch(register(form));
+    const result = await dispatch(registerUser(form));
 
-    if (register.fulfilled.match(result)) {
+    if (registerUser.fulfilled.match(result)) {
       navigate("/");
     }
   };

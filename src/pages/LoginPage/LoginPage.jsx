@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 
-import { login } from "../../store/authSlice";
+import { loginUser } from "../../store/authSlice";
 
 import styles from "./LoginPage.module.css";
 
@@ -28,10 +28,8 @@ function LoginPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    const result = await dispatch(login(form));
-
-    if (login.fulfilled.match(result)) {
+    const result = await dispatch(loginUser(form));
+    if (loginUser.fulfilled.match(result)) {
       navigate("/");
     }
   };

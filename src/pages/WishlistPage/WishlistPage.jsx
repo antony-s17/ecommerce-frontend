@@ -1,8 +1,9 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 import { fetchWishlist } from "../../store/wishlistSlice";
+
 import ProductCard from "../../components/ProductCard/ProductCard";
 
 import styles from "./WishlistPage.module.css";
@@ -24,20 +25,7 @@ function WishlistPage() {
     return (
       <main className={styles.page}>
         <div className={styles.message}>
-          <div className={styles.spinner}></div>
-          <p>Cargando favoritos...</p>
-        </div>
-      </main>
-    );
-  }
-
-  if (error && items.length === 0) {
-    return (
-      <main className={styles.page}>
-        <div className={styles.empty}>
-          <span>♡</span>
-          <h1>No pudimos cargar tus favoritos</h1>
-          <p>{error}</p>
+          Cargando favoritos...
         </div>
       </main>
     );
@@ -48,48 +36,62 @@ function WishlistPage() {
       <section className={styles.container}>
         <div className={styles.header}>
           <div>
-            <span className={styles.eyebrow}>
-              Tus favoritos
+            <span className={styles.badge}>
+              Mis favoritos
             </span>
 
-            <h1>Favoritos</h1>
+            <h1>Lista de deseos</h1>
 
             <p>
-              Guarda los productos que más te gustan.
+              Guarda tus videojuegos favoritos
+              para encontrarlos fácilmente.
             </p>
           </div>
 
-          {items.length > 0 && (
-            <span className={styles.count}>
-              {items.length} productos
-            </span>
-          )}
+          <span className={styles.counter}>
+            {items.length}{" "}
+            {items.length === 1
+              ? "producto"
+              : "productos"}
+          </span>
         </div>
 
-        {items.length === 0 ? (
-          <div className={styles.empty}>
-            <span>♡</span>
-
-            <h2>Aún no tienes favoritos</h2>
-
-            <p>
-              Explora nuestros productos y guarda los que
-              más te interesen.
-            </p>
-
-            <Link
-              to="/products"
-              className={styles.button}
-            >
-              Explorar productos
-            </Link>
+        {error && (
+          <div className={styles.error}>
+            {error}
           </div>
-        ) : (
+        )}
+
+        {!loading &&
+          !error &&
+          items.length === 0 && (
+            <div className={styles.empty}>
+              <div className={styles.emptyIcon}>
+                ♡
+              </div>
+
+              <h2>Tu lista está vacía</h2>
+
+              <p>
+                Explora nuestro catálogo y agrega
+                videojuegos a tus favoritos.
+              </p>
+
+              <Link
+                to="/products"
+                className={styles.button}
+              >
+                Explorar videojuegos
+              </Link>
+            </div>
+          )}
+
+        {items.length > 0 && (
           <div className={styles.grid}>
-            {items.map((item) => (
+            {items.map((product) => (
               <ProductCard
-                key={item.id || item.product?.id}
-                product={item.product || item}
+                key={product.id}
+                product={product}
               />
             ))}
           </div>

@@ -5,7 +5,7 @@ import { fetchProducts } from "../../store/productsSlice";
 
 import ProductCard from "../../components/ProductCard/ProductCard";
 
-import styles from "./ProductPage.module.css";
+import styles from "./ProductsPage.module.css";
 
 function ProductsPage() {
   const dispatch = useDispatch();

@@ -1,20 +1,33 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 
 import { getProductById } from "../../api/products";
 import { addProductToCart } from "../../store/cartSlice";
 import { addProductToWishlist } from "../../store/wishlistSlice";
 
+import ReviewsSection from "../../components/ReviewsSection/ReviewsSection";
+
 import styles from "./ProductDetailPage.module.css";
 
 function ProductDetailPage() {
   const { id } = useParams();
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { isAuthenticated } = useSelector((state) => state.auth);
-  const { loading: cartLoading } = useSelector((state) => state.cart);
+  const { isAuthenticated } = useSelector(
+    (state) => state.auth
+  );
+
+  const { loading: cartLoading } = useSelector(
+    (state) => state.cart
+  );
+
   const { loading: wishlistLoading } = useSelector(
     (state) => state.wishlist
   );
@@ -22,6 +35,10 @@ function ProductDetailPage() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  /* =========================
+     CARGAR PRODUCTO
+  ========================= */
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -32,7 +49,11 @@ function ProductDetailPage() {
         const response = await getProductById(id);
 
         if (!response.ok) {
-          setError(response.message);
+          setError(
+            response.message ||
+              "No se pudo obtener el producto"
+          );
+
           return;
         }
 
@@ -47,78 +68,116 @@ function ProductDetailPage() {
       }
     };
 
-    loadProduct();
+    if (id) {
+      loadProduct();
+    }
   }, [id]);
 
-  const handleAddToCart = () => {
+  /* =========================
+     AGREGAR AL CARRITO
+  ========================= */
+
+  const handleAddToCart = async () => {
     if (!isAuthenticated) {
       navigate("/login");
       return;
     }
 
-    dispatch(addProductToCart(product.id));
+    await dispatch(
+      addProductToCart(id)
+    );
   };
 
-  const handleAddToWishlist = () => {
+  /* =========================
+     AGREGAR A FAVORITOS
+  ========================= */
+
+  const handleAddToWishlist = async () => {
     if (!isAuthenticated) {
       navigate("/login");
       return;
     }
 
-    dispatch(addProductToWishlist(product.id));
+    await dispatch(
+      addProductToWishlist(id)
+    );
   };
+
+  /* =========================
+     LOADING
+  ========================= */
 
   if (loading) {
     return (
       <main className={styles.page}>
         <div className={styles.message}>
-          <div className={styles.spinner}></div>
-          <p>Cargando producto...</p>
+          Cargando producto...
         </div>
       </main>
     );
   }
+
+  /* =========================
+     ERROR
+  ========================= */
 
   if (error || !product) {
     return (
       <main className={styles.page}>
-        <div className={styles.error}>
-          <span>⚠️</span>
-          <h1>No encontramos el producto</h1>
-          <p>{error || "El producto no existe."}</p>
-          <Link to="/products" className={styles.backButton}>
-            Volver a productos
-          </Link>
+        <div className={styles.message}>
+          {error || "Producto no encontrado"}
         </div>
       </main>
     );
   }
 
+  /* =========================
+     PRODUCTO
+  ========================= */
+
   return (
     <main className={styles.page}>
       <section className={styles.container}>
-        <Link to="/products" className={styles.back}>
+        <Link
+          to="/products"
+          className={styles.back}
+        >
           ← Volver a productos
         </Link>
 
         <div className={styles.product}>
+          {/* IMAGEN */}
+
           <div className={styles.imageContainer}>
-            <img
-              src={product.image}
-              alt={product.name}
-              className={styles.image}
-            />
+            {product.imageUrl ? (
+              <img
+                src={product.imageUrl}
+                alt={product.name}
+                className={styles.image}
+              />
+            ) : (
+              <div className={styles.noImage}>
+                🎮
+              </div>
+            )}
           </div>
+
+          {/* INFORMACIÓN */}
 
           <div className={styles.info}>
             <span className={styles.category}>
-              {product.category?.name || "Producto"}
+              Videojuego
             </span>
 
-            <h1>{product.name}</h1>
+            <h1>
+              {product.name}
+            </h1>
 
             <div className={styles.price}>
-              S/ {Number(product.price).toFixed(2)}
+              S/{" "}
+              {Number(
+                product.price
+              ).toFixed(2)}
             </div>
 
             <p className={styles.description}>
@@ -126,12 +185,42 @@ function ProductDetailPage() {
                 "Este producto no tiene una descripción disponible."}
             </p>
 
+            {/* STOCK */}
+
+            <div className={styles.stock}>
+              {Number(product.stock) > 0 ? (
+                <span>
+                  Stock disponible:{" "}
+                  <strong>
+                    {product.stock}
+                  </strong>
+                </span>
+              ) : (
+                <span
+                  className={
+                    styles.outOfStock
+                  }
+                >
+                  Sin stock
+                </span>
+              )}
+            </div>
+
+            {/* ACCIONES */}
+
             <div className={styles.actions}>
               <button
                 type="button"
-                className={styles.cartButton}
-                onClick={handleAddToCart}
-                disabled={cartLoading}
+                className={
+                  styles.cartButton
+                }
+                onClick={
+                  handleAddToCart
+                }
+                disabled={
+                  cartLoading ||
+                  Number(product.stock) <= 0
+                }
               >
                 {cartLoading
                   ? "Agregando..."
@@ -140,17 +229,33 @@ function ProductDetailPage() {
 
               <button
                 type="button"
-                className={styles.wishlistButton}
-                onClick={handleAddToWishlist}
-                disabled={wishlistLoading}
+                className={
+                  styles.wishlistButton
+                }
+                onClick={
+                  handleAddToWishlist
+                }
+                disabled={
+                  wishlistLoading
+                }
               >
                 {wishlistLoading
-                  ? "Guardando..."
+                  ? "Agregando..."
                   : "♡ Agregar a favoritos"}
               </button>
             </div>
           </div>
         </div>
+
+        {/* =====================
+            RESEÑAS
+        ===================== */}
+
+        {isAuthenticated && id && (
+          <ReviewsSection
+            productId={id}
+          />
+        )}
       </section>
     </main>
   );
