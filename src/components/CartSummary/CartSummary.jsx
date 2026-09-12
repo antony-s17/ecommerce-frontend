@@ -1,5 +1,4 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 
 import { processCheckout } from "../../store/cartSlice";
 
@@ -7,7 +6,6 @@ import styles from "./CartSummary.module.css";
 
 function CartSummary() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const {
     items,
@@ -35,11 +33,11 @@ function CartSummary() {
     if (
       processCheckout.fulfilled.match(result)
     ) {
-      navigate("/checkout/success", {
-        state: {
-          order: result.payload,
-        },
-      });
+      const { url } = result.payload;
+
+      if (url) {
+        window.location.href = url;
+      }
     }
   };
 
@@ -54,6 +52,7 @@ function CartSummary() {
 
       <div className={styles.row}>
         <span>Subtotal</span>
+
         <strong>
           S/ {subtotal.toFixed(2)}
         </strong>
@@ -85,13 +84,13 @@ function CartSummary() {
         }
       >
         {loading
-          ? "Procesando..."
-          : "Confirmar compra"}
+          ? "Redirigiendo a Stripe..."
+          : "Pagar con Stripe"}
       </button>
 
       <p className={styles.paymentInfo}>
-        Pago simulado. No se realizará
-        ningún cobro real.
+        Pago procesado con Stripe en modo test.
+        No se realizará ningún cobro real.
       </p>
     </aside>
   );
