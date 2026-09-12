@@ -247,8 +247,6 @@
   color: white;
 }
 
-/* panel derecho */
-
 .decoration {
   position: relative;
 
@@ -389,8 +387,6 @@
     0 0 0 160px
       rgba(37, 99, 235, 0.015);
 }
-
-/* responsive */
 
 @media (max-width: 850px) {
   .page {

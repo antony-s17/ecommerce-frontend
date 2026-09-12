@@ -312,8 +312,6 @@
   cursor: not-allowed;
 }
 
-/* estados */
-
 .message {
   min-height: 60vh;
 
@@ -389,8 +387,6 @@
   text-decoration: none;
 }
 
-/* reviews */
-
 .container > section:last-child {
   margin-top: 72px;
 }
@@ -400,8 +396,6 @@
     transform: rotate(360deg);
   }
 }
-
-/* responsive */
 
 @media (max-width: 900px) {
   .product {
