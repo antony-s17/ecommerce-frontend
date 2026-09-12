@@ -13,7 +13,7 @@ function RegisterPage() {
   const { loading, error } = useSelector((state) => state.auth);
 
   const [form, setForm] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
   });
@@ -55,16 +55,16 @@ function RegisterPage() {
           onSubmit={handleSubmit}
         >
           <div className={styles.field}>
-            <label htmlFor="name">
-              Nombre
+            <label htmlFor="username">
+              Nombre de usuario
             </label>
 
             <input
-              id="name"
-              name="name"
+              id="username"
+              name="username"
               type="text"
-              placeholder="Tu nombre"
-              value={form.name}
+              placeholder="Tu nombre de usuario"
+              value={form.username}
               onChange={handleChange}
               required
             />
