@@ -190,7 +190,7 @@ function Navbar() {
                   <div
                     className={styles.avatar}
                   >
-                    {user?.name
+                    {user?.username
                       ?.charAt(0)
                       .toUpperCase() || "U"}
                   </div>
@@ -199,7 +199,7 @@ function Navbar() {
                     className={styles.userInfo}
                   >
                     <strong>
-                      {user?.name || "Usuario"}
+                      {user?.username || "Usuario"}
                     </strong>
 
                     <span>
