@@ -4,9 +4,9 @@
 
 Frontend application for **Pixel Market**, a full-stack video game e-commerce project.
 
-The application provides a responsive user interface for browsing products, viewing product details, managing a shopping cart and wishlist, publishing product reviews, and completing a simulated checkout.
+The application provides a responsive user interface for browsing products, viewing product details, managing a shopping cart and wishlist, publishing product reviews, and completing payments through Stripe Checkout.
 
-It also includes authentication, role-based access control, protected routes, and an administration panel for product management.
+It also includes authentication, role-based access control, protected routes, an administration panel for product management, and payment confirmation after successful Stripe transactions.
 
 The frontend consumes the Pixel Market REST API and uses cookie-based JWT authentication.
 
@@ -14,9 +14,9 @@ The frontend consumes the Pixel Market REST API and uses cookie-based JWT authen
 
 ## 🚀 Demo
 
-- Frontend: `http://localhost:5173`
-- Backend API: `http://localhost:3000/api`
-- Swagger UI: `http://localhost:3000/api/docs`
+- Frontend: `https://pixel-market-videogames.netlify.app`
+- Backend API: `https://ecommerce-backend-6dm1.onrender.com/api`
+- Swagger UI: `https://ecommerce-backend-6dm1.onrender.com/api/docs`
 
 ---
 
@@ -29,6 +29,7 @@ The frontend consumes the Pixel Market REST API and uses cookie-based JWT authen
 - Redux Toolkit
 - Axios
 - CSS Modules
+- Stripe Checkout
 - pnpm
 - REST API integration
 - JWT authentication using HTTP-only cookies
@@ -64,8 +65,12 @@ The frontend consumes the Pixel Market REST API and uses cookie-based JWT authen
 - Product quantity information
 - Calculate product subtotals
 - Calculate order total
-- Simulated checkout
+- Stripe Checkout integration
+- Redirect to Stripe-hosted payment page
+- Stripe payment confirmation
+- Order creation after successful payment
 - Checkout success page
+- Cart cleanup after successful checkout
 
 ### Wishlist
 
@@ -111,6 +116,7 @@ Administrators have access to a protected management panel that allows them to:
 pixel-market-frontend/
 
 ├── public/
+│   └── _redirects
 │
 ├── src/
 │   ├── api/
@@ -193,6 +199,8 @@ VITE_API_URL=http://localhost:3000/api
 ```
 
 The URL must point to the Pixel Market backend API.
+
+Stripe secret credentials are **not stored in the frontend**. Stripe Checkout Sessions are created by the backend.
 
 ---
 
@@ -290,7 +298,7 @@ These credentials are provided for evaluation purposes only.
 | `/register` | User registration | Public |
 | `/wishlist` | User wishlist | Authenticated |
 | `/cart` | Shopping cart | Authenticated |
-| `/checkout/success` | Checkout confirmation | Authenticated |
+| `/checkout/success` | Stripe checkout confirmation | Authenticated |
 | `/admin` | Product administration | ADMIN |
 | `*` | 404 page | Public |
 
@@ -320,6 +328,24 @@ Product reviews are handled as nested product resources:
 /api/product/{productId}/reviews
 ```
 
+### Checkout Endpoints
+
+Stripe checkout is initialized through:
+
+```text
+POST /api/cart/checkout
+```
+
+The backend creates a Stripe Checkout Session and returns the Stripe-hosted payment URL.
+
+After payment, the Stripe Checkout Session is confirmed through:
+
+```text
+POST /api/cart/checkout/confirm
+```
+
+The frontend sends the Stripe `sessionId` to the backend. The backend verifies the payment before creating the final order.
+
 ---
 
 ## 🛒 Shopping Cart Flow
@@ -341,9 +367,21 @@ Refresh Cart
       ↓
 Cart Page
       ↓
-Checkout
+Pay with Stripe
       ↓
 POST /api/cart/checkout
+      ↓
+Stripe Checkout
+      ↓
+Payment
+      ↓
+/checkout/success?session_id=...
+      ↓
+POST /api/cart/checkout/confirm
+      ↓
+Order Creation
+      ↓
+Cart Completion
       ↓
 Checkout Success
 ```
@@ -355,6 +393,121 @@ Cart information includes:
 - Unit price
 - Subtotal
 - Order total
+
+---
+
+## 💳 Stripe Checkout
+
+Pixel Market integrates **Stripe Checkout** to process payments securely in test mode.
+
+Payment information is entered directly on the Stripe-hosted Checkout page. The frontend does not handle or store card information.
+
+The checkout process follows this flow:
+
+```text
+Shopping Cart
+      ↓
+POST /api/cart/checkout
+      ↓
+Backend creates Stripe Checkout Session
+      ↓
+Frontend receives Stripe Checkout URL
+      ↓
+Redirect to Stripe Checkout
+      ↓
+User completes payment
+      ↓
+Stripe redirects to
+/checkout/success?session_id=...
+      ↓
+Frontend reads session_id
+      ↓
+POST /api/cart/checkout/confirm
+      ↓
+Backend retrieves Stripe Checkout Session
+      ↓
+Verify payment_status === "paid"
+      ↓
+Validate authenticated user
+      ↓
+Create Order
+      ↓
+Complete Cart
+      ↓
+Checkout Success Page
+```
+
+### Starting a Payment
+
+When the user clicks **Pay with Stripe**, the frontend sends:
+
+```text
+POST /api/cart/checkout
+```
+
+The backend creates a Stripe Checkout Session using the products currently stored in the authenticated user's cart.
+
+The backend returns:
+
+```text
+Stripe Checkout URL
+Stripe Session ID
+```
+
+The frontend then redirects the browser to the Stripe-hosted Checkout page.
+
+### Payment Confirmation
+
+After a successful payment, Stripe redirects the browser to:
+
+```text
+/checkout/success?session_id={CHECKOUT_SESSION_ID}
+```
+
+`CheckoutSuccessPage` reads the `session_id` from the URL and sends it to:
+
+```text
+POST /api/cart/checkout/confirm
+```
+
+The backend retrieves the Checkout Session directly from Stripe and verifies that:
+
+```text
+payment_status === "paid"
+```
+
+It also verifies that the Stripe Session belongs to the authenticated user.
+
+Only after the payment has been successfully verified is the order created.
+
+### Stripe Test Mode
+
+The project currently uses Stripe in test mode.
+
+A standard Stripe test card can be used:
+
+```text
+Card number: 4242 4242 4242 4242
+Expiration: Any future date
+CVC: Any valid 3-digit value
+```
+
+No real payment is processed while Stripe test credentials are being used.
+
+### Stripe Security
+
+Stripe secret credentials are stored exclusively in the backend.
+
+The frontend does **not** contain:
+
+```text
+STRIPE_SECRET_KEY
+sk_test_...
+```
+
+The frontend only communicates with the Pixel Market backend, while the backend communicates securely with Stripe.
+
+This prevents Stripe secret credentials from being exposed in the browser.
 
 ---
 
@@ -490,8 +643,11 @@ Manages:
 
 - Active cart
 - Cart items
-- Checkout
+- Cart loading states
+- Stripe checkout initialization
+- Checkout errors
 - Order information
+- Cart cleanup after successful payment
 
 ### wishlistSlice
 
@@ -549,6 +705,61 @@ Responsive behavior includes:
 
 ---
 
+## 🌐 Netlify Deployment
+
+The frontend can be deployed to Netlify.
+
+The production API URL should be configured as an environment variable in Netlify:
+
+```env
+VITE_API_URL=https://your-backend-domain.com/api
+```
+
+Because Pixel Market uses React Router, direct access to client-side routes requires an SPA fallback.
+
+The project includes:
+
+```text
+public/_redirects
+```
+
+with:
+
+```text
+/*    /index.html    200
+```
+
+During the Vite build, the file is copied to:
+
+```text
+dist/_redirects
+```
+
+This allows Netlify to serve `index.html` when accessing or refreshing routes such as:
+
+```text
+/products
+/product/:id
+/cart
+/wishlist
+/admin
+/checkout/success
+```
+
+React Router then handles the requested route on the client.
+
+This configuration is particularly important for Stripe because Stripe redirects the browser directly to:
+
+```text
+/checkout/success?session_id=...
+```
+
+after a successful payment.
+
+Without the SPA fallback, Netlify would attempt to find a physical `/checkout/success` file and return a 404 page.
+
+---
+
 ## 📌 Best Practices Applied
 
 - Component-based React architecture
@@ -567,6 +778,10 @@ Responsive behavior includes:
 - HTTP-only cookie authentication
 - Client-side form validation
 - Backend validation as the final source of truth
+- Stripe-hosted payment interface
+- Backend payment verification
+- Stripe secret key isolation
+- SPA fallback routing for Netlify
 
 ---
 
@@ -588,7 +803,9 @@ The backend provides:
 - MongoDB/Mongoose reviews
 - Shopping cart
 - Wishlist
-- Checkout
+- Stripe Checkout Session creation
+- Stripe payment verification
+- Order creation after successful payment
 - Cloudinary image management
 - Swagger/OpenAPI documentation
 
