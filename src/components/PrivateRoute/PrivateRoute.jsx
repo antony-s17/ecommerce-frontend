@@ -1,18 +1,38 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
 
+import styles from "./PrivateRoute.module.css";
+
 function PrivateRoute() {
-    const { isAuthenticated, loading } = useSelector((state) => state.auth);
+  const {
+    isAuthenticated,
+    loading,
+  } = useSelector((state) => state.auth);
 
-    if (loading) {
-        return <div>Cargando...</div>;
-    }
+  if (loading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingContent}>
+          <div className={styles.spinner}></div>
 
-    if (!isAuthenticated) {
-        return <Navigate to="/login" replace />;
-    }
+          <p className={styles.loadingText}>
+            Verificando sesión...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
-    return <Outlet />;
+  if (!isAuthenticated) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
+  }
+
+  return <Outlet />;
 }
 
 export default PrivateRoute;

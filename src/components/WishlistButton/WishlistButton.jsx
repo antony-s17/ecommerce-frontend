@@ -12,23 +12,32 @@ function WishlistButton({ productId }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { isAuthenticated } = useSelector((state) => state.auth);
-  const { items, loading } = useSelector((state) => state.wishlist);
+  const { isAuthenticated } = useSelector(
+    (state) => state.auth
+  );
 
-  const isFavorite = items.some((item) => {
-    return item.productId === productId || item.id === productId;
-  });
+  const { items, loading } = useSelector(
+    (state) => state.wishlist
+  );
 
-  const handleClick = () => {
+  const isFavorite = items.some(
+    (item) => item.id === productId
+  );
+
+  const handleClick = async () => {
     if (!isAuthenticated) {
       navigate("/login");
       return;
     }
 
     if (isFavorite) {
-      dispatch(removeProductFromWishlist(productId));
+      await dispatch(
+        removeProductFromWishlist(productId)
+      );
     } else {
-      dispatch(addProductToWishlist(productId));
+      await dispatch(
+        addProductToWishlist(productId)
+      );
     }
   };
 

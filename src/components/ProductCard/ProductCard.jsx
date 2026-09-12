@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
+import WishlistButton from "../WishlistButton/WishlistButton";
 
 import styles from "./ProductCard.module.css";
-import WishlistButton from "../WishlistButton/WishlistButton";
 
 function ProductCard({ product }) {
   return (
@@ -10,16 +10,22 @@ function ProductCard({ product }) {
         to={`/products/${product.id}`}
         className={styles.imageContainer}
       >
-        <img
-          src={product.image}
-          alt={product.name}
-          className={styles.image}
-        />
+        {product.imageUrl ? (
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            className={styles.image}
+          />
+        ) : (
+          <div className={styles.noImage}>
+            🎮
+          </div>
+        )}
       </Link>
 
       <div className={styles.content}>
         <span className={styles.category}>
-          {product.category}
+          Videojuego
         </span>
 
         <Link

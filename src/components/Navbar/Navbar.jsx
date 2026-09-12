@@ -1,8 +1,18 @@
 import { useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import {
+  Link,
+  NavLink,
+  useNavigate,
+} from "react-router-dom";
 
-import { logout } from "../../store/authSlice";
+import {
+  useDispatch,
+  useSelector,
+} from "react-redux";
+
+import { logoutUser } from "../../store/authSlice";
+import { clearCart } from "../../store/cartSlice";
+import { clearWishlist } from "../../store/wishlistSlice";
 
 import styles from "./Navbar.module.css";
 
@@ -12,155 +22,215 @@ function Navbar() {
 
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const { user, isAuthenticated, loading } = useSelector(
-    (state) => state.auth
+  const {
+    user,
+    isAuthenticated,
+  } = useSelector((state) => state.auth);
+
+  const {
+    items: cartItems,
+  } = useSelector((state) => state.cart);
+
+  const {
+    items: wishlistItems,
+  } = useSelector((state) => state.wishlist);
+
+  const cartCount = cartItems.reduce(
+    (total, item) =>
+      total + Number(item.quantity || 0),
+    0
   );
 
-  const cartItems = useSelector(
-    (state) => state.cart.items
-  );
-
-  const wishlistItems = useSelector(
-    (state) => state.wishlist.items
-  );
-
-  const handleLogout = async () => {
-    const result = await dispatch(logout());
-
-    if (logout.fulfilled.match(result)) {
-      setMenuOpen(false);
-      navigate("/login");
-    }
-  };
+  const wishlistCount =
+    wishlistItems.length;
 
   const closeMenu = () => {
     setMenuOpen(false);
   };
 
+  const handleLogout = async () => {
+    const result = await dispatch(
+      logoutUser()
+    );
+
+    if (
+      logoutUser.fulfilled.match(result)
+    ) {
+      dispatch(clearCart());
+      dispatch(clearWishlist());
+
+      closeMenu();
+
+      navigate("/login");
+    }
+  };
+
   return (
     <header className={styles.header}>
       <nav className={styles.navbar}>
-        {/* Logo */}
         <Link
           to="/"
           className={styles.logo}
           onClick={closeMenu}
         >
-          <span className={styles.logoIcon}>P</span>
+          <span className={styles.logoIcon}>
+            🎮
+          </span>
 
-          <span>Pixel Market</span>
+          <span>
+            Pixel Market
+          </span>
         </Link>
 
-        {/* Navegación principal */}
+        <button
+          type="button"
+          className={styles.menuButton}
+          onClick={() =>
+            setMenuOpen((value) => !value)
+          }
+          aria-label="Abrir menú"
+          aria-expanded={menuOpen}
+        >
+          {menuOpen ? "✕" : "☰"}
+        </button>
+
         <div
-          className={`${styles.navLinks} ${
-            menuOpen ? styles.navLinksOpen : ""
+          className={`${styles.menu} ${
+            menuOpen ? styles.menuOpen : ""
           }`}
         >
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              `${styles.navLink} ${
-                isActive ? styles.active : ""
-              }`
-            }
-            onClick={closeMenu}
-          >
-            Inicio
-          </NavLink>
+          <div className={styles.links}>
+            <NavLink
+              to="/"
+              onClick={closeMenu}
+              className={({ isActive }) =>
+                isActive
+                  ? styles.active
+                  : styles.link
+              }
+            >
+              Inicio
+            </NavLink>
 
-          <NavLink
-            to="/products"
-            className={({ isActive }) =>
-              `${styles.navLink} ${
-                isActive ? styles.active : ""
-              }`
-            }
-            onClick={closeMenu}
-          >
-            Productos
-          </NavLink>
+            <NavLink
+              to="/products"
+              onClick={closeMenu}
+              className={({ isActive }) =>
+                isActive
+                  ? styles.active
+                  : styles.link
+              }
+            >
+              Productos
+            </NavLink>
 
-          {isAuthenticated && (
-            <>
-              <NavLink
-                to="/wishlist"
-                className={({ isActive }) =>
-                  `${styles.navLink} ${
-                    isActive ? styles.active : ""
-                  }`
-                }
-                onClick={closeMenu}
-              >
-                Favoritos
+            {isAuthenticated && (
+              <>
+                <NavLink
+                  to="/wishlist"
+                  onClick={closeMenu}
+                  className={({ isActive }) =>
+                    isActive
+                      ? styles.active
+                      : styles.link
+                  }
+                >
+                  Favoritos
 
-                {wishlistItems.length > 0 && (
-                  <span className={styles.badge}>
-                    {wishlistItems.length}
-                  </span>
+                  {wishlistCount > 0 && (
+                    <span
+                      className={styles.counter}
+                    >
+                      {wishlistCount}
+                    </span>
+                  )}
+                </NavLink>
+
+                <NavLink
+                  to="/cart"
+                  onClick={closeMenu}
+                  className={({ isActive }) =>
+                    isActive
+                      ? styles.active
+                      : styles.link
+                  }
+                >
+                  Carrito
+
+                  {cartCount > 0 && (
+                    <span
+                      className={styles.counter}
+                    >
+                      {cartCount}
+                    </span>
+                  )}
+                </NavLink>
+
+                {user?.role === "ADMIN" && (
+                  <NavLink
+                    to="/admin"
+                    onClick={closeMenu}
+                    className={({ isActive }) =>
+                      isActive
+                        ? styles.active
+                        : styles.link
+                    }
+                  >
+                    Admin
+                  </NavLink>
                 )}
-              </NavLink>
+              </>
+            )}
+          </div>
 
-              <NavLink
-                to="/cart"
-                className={({ isActive }) =>
-                  `${styles.navLink} ${
-                    isActive ? styles.active : ""
-                  }`
-                }
-                onClick={closeMenu}
-              >
-                Carrito
-
-                {cartItems.length > 0 && (
-                  <span className={styles.badge}>
-                    {cartItems.length}
-                  </span>
-                )}
-              </NavLink>
-            </>
-          )}
-
-          {/* Acciones */}
-          <div className={styles.actions}>
+          <div className={styles.userSection}>
             {isAuthenticated ? (
               <>
                 <div className={styles.user}>
-                  <div className={styles.avatar}>
-                    {user?.name?.charAt(0).toUpperCase()}
+                  <div
+                    className={styles.avatar}
+                  >
+                    {user?.name
+                      ?.charAt(0)
+                      .toUpperCase() || "U"}
                   </div>
 
-                  <span className={styles.userName}>
-                    {user?.name}
-                  </span>
-                </div>
-
-                {user?.role === "ADMIN" && (
-                  <Link
-                    to="/admin"
-                    className={styles.adminButton}
-                    onClick={closeMenu}
+                  <div
+                    className={styles.userInfo}
                   >
-                    Administración
-                  </Link>
-                )}
+                    <strong>
+                      {user?.name || "Usuario"}
+                    </strong>
+
+                    <span>
+                      {user?.role === "ADMIN"
+                        ? "Administrador"
+                        : "Cliente"}
+                    </span>
+                  </div>
+                </div>
 
                 <button
                   type="button"
-                  className={styles.logoutButton}
+                  className={
+                    styles.logoutButton
+                  }
                   onClick={handleLogout}
-                  disabled={loading}
                 >
-                  {loading
-                    ? "Saliendo..."
-                    : "Cerrar sesión"}
+                  Cerrar sesión
                 </button>
               </>
             ) : (
-              <>
+              <div
+                className={
+                  styles.authButtons
+                }
+              >
                 <Link
                   to="/login"
-                  className={styles.loginButton}
+                  className={
+                    styles.loginButton
+                  }
                   onClick={closeMenu}
                 >
                   Iniciar sesión
@@ -168,26 +238,17 @@ function Navbar() {
 
                 <Link
                   to="/register"
-                  className={styles.registerButton}
+                  className={
+                    styles.registerButton
+                  }
                   onClick={closeMenu}
                 >
-                  Crear cuenta
+                  Registrarse
                 </Link>
-              </>
+              </div>
             )}
           </div>
         </div>
-
-        <button
-          type="button"
-          className={styles.menuButton}
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Abrir menú"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
       </nav>
     </header>
   );
