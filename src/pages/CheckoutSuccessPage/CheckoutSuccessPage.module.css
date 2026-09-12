@@ -198,3 +198,43 @@
     gap: 5px;
   }
 }
+
+.spinner {
+  width: 52px;
+  height: 52px;
+
+  margin: 0 auto 24px;
+
+  border: 4px solid rgba(255, 255, 255, 0.08);
+  border-top-color: #06b6d4;
+
+  border-radius: 50%;
+
+  animation: spin 0.8s linear infinite;
+}
+
+.errorIcon {
+  width: 76px;
+  height: 76px;
+
+  display: grid;
+  place-items: center;
+
+  margin: 0 auto 20px;
+
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  border-radius: 50%;
+
+  background: rgba(127, 29, 29, 0.2);
+
+  color: #f87171;
+
+  font-size: 36px;
+  font-weight: 900;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
