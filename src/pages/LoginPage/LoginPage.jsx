@@ -17,6 +17,8 @@ function LoginPage() {
     password: "",
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -67,26 +69,31 @@ function LoginPage() {
             />
           </div>
 
-          <div className={styles.field}>
-            <div className={styles.passwordHeader}>
-              <label htmlFor="password">
-                Contraseña
-              </label>
-
-              <a href="#" className={styles.forgot}>
-                ¿Olvidaste tu contraseña?
-              </a>
-            </div>
-
+          <div className={styles.passwordContainer}>
             <input
               id="password"
               name="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               value={form.password}
               onChange={handleChange}
               required
             />
+
+            <button
+              type="button"
+              className={styles.passwordToggle}
+              onClick={() =>
+                setShowPassword((prev) => !prev)
+              }
+              aria-label={
+                showPassword
+                  ? "Ocultar contraseña"
+                  : "Mostrar contraseña"
+              }
+            >
+              {showPassword ? "Ocultar" : "Ver"}
+            </button>
           </div>
 
           {error && (
