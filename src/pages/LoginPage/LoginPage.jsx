@@ -69,31 +69,51 @@ function LoginPage() {
             />
           </div>
 
-          <div className={styles.passwordContainer}>
-            <input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
+          <div className={styles.field}>
+            <div className={styles.passwordHeader}>
+              <label htmlFor="password">
+                Contraseña
+              </label>
+          </div>
 
-            <button
-              type="button"
-              className={styles.passwordToggle}
-              onClick={() =>
-                setShowPassword((prev) => !prev)
-              }
-              aria-label={
-                showPassword
-                  ? "Ocultar contraseña"
-                  : "Mostrar contraseña"
-              }
-            >
-              {showPassword ? "Ocultar" : "Ver"}
-            </button>
+          <div className={styles.passwordContainer}>
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={form.password}
+                onChange={handleChange}
+                required
+              />
+
+              <button
+                type="button"
+                className={styles.passwordToggle}
+                onClick={() =>
+                  setShowPassword((prev) => !prev)
+                }
+                aria-label={
+                  showPassword
+                    ? "Ocultar contraseña"
+                    : "Mostrar contraseña"
+                }
+              >
+                {showPassword ? (
+                  <svg viewBox="0 0 24 24">
+                    <path d="M3 3l18 18" />
+                    <path d="M10.6 10.6a2 2 0 002.8 2.8" />
+                    <path d="M9.9 4.2A10.7 10.7 0 0112 4c5 0 9 4 10 8a13.2 13.2 0 01-2 4" />
+                    <path d="M6.6 6.6A13.5 13.5 0 002 12c1 4 5 8 10 8a10.5 10.5 0 005.4-1.5" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24">
+                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
 
           {error && (
