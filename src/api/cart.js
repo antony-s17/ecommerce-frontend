@@ -10,17 +10,14 @@ export const addToCart = async(product) => {
     return response.data;
 }
 
-/*export const updateCartItem = async(id, data) => {
-    const response = await api.put(`/cart/${id}`, data );
-    return response.data;
-}
-
-export const removeFromCart = async(id) => {
-    const response = await api.delete(`/cart/${id}`);
-    return response.data;
-}*/
-
 export const checkout = async() => {
     const response = await api.post("/cart/checkout");
     return response.data;
 }
+
+export const confirmCheckout = async (sessionId) => {
+  const response = await api.post("/cart/checkout/confirm", { sessionId }
+  );
+
+  return response.data;
+};
